@@ -1,0 +1,1 @@
+java -cp classes;lib/servlet-api.jar com.etheli.imdtabler.FreqSetGen %*

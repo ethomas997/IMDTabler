@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb"><head>
+
+
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+  <meta http-equiv="content-style-type" content="text/css" /><title>ET's FPV IMD Tools</title>
+  
+
+
+  <meta content="Eric Thomas" name="author" /></head><body alink="#000099" bgcolor="#ccccff" link="#000099" text="#000000" vlink="#990099">
+<div class="content">
+<small><a target="_blank" href="http://www.etheli.com">&lt;&lt;&lt;
+etheli.com Home Page</a></small></div>
+
+<h2>ET's FPV IMD Tools</h2>
+
+<big>IMD (Intermodulation Distortion) is when two
+transmitters combine to produce interference at a third
+frequency.&nbsp; For instance, if using the frequencies 5760, 5800 and 5840,
+any two of these will work well together, but when all three
+frequencies are in use IMD interferece is generated at 5760 and 5840
+Mhz.&nbsp; If the 5840 frequency is changed to 5880 then IMD
+interference is not seen at any of the three frequencies in use.&nbsp;
+IMD is calculated with this formula:&nbsp; F3 = (F1^2) - F2<br />
+<br />
+See <a href="http://www.rcgroups.com/forums/showthread.php?t=2447038" target="_blank">here for an rcgroups discussion thread on IMD</a>.&nbsp; (Also <a href="http://forum.multigp.com/forum/event-race-management/186-frequency-profiles-what-they-actually-mean" target="_blank">here</a> and <a href="http://www.nwfpv.com/the-lounge/189-5-8ghz-fpv-distortion-imd-intermodulation-distortion.html" target="_blank">here</a>.)&nbsp; There's a <a href="http://www.youtube.com/watch?v=axWXu8ih8Oc" target="_blank">video</a> that demonstrates the effect.&nbsp;
+Folks on the thread have generated spreadsheets to tabulate IMD
+values.&nbsp; This looked like a good place for some software, so I've
+created the tools below:<br />
+<br />
+<br />
+<a href="http://etserv.etheli.com/IMDTabler/run" target="_blank"><b>IMDTabler</b></a><br />
+<br />
+The <a href="http://etserv.etheli.com/IMDTabler/run" target="_blank">IMDTabler tool</a>
+generates a table of IMD values for a given set of frequencies.&nbsp;
+Table cells are colored red to indicate where IMD frequencies would
+cause interference with the given frequencies, and hovering the mouse
+cursor over a cell will show more information.&nbsp; Each generated
+table is given an IMD rating, with a score of 100 corresponding to
+minimal IMD interference.<br />
+<br />
+Clicking on one of the links at the top of the <a href="http://etserv.etheli.com/IMDTabler/run" target="_blank">IMDTabler page</a> will generate a table with the given frequencies.&nbsp; To generate tables for the examples described above:&nbsp; </big><a href="http://etserv.etheli.com/IMDTabler/run?freq_values=5760+5800+5840" target="_blank"><big>5760 5800 5840</big></a>&nbsp; <big>&nbsp; </big><a href="http://etserv.etheli.com/IMDTabler/run?freq_values=5760+5800+5880" target="_blank"><big>5760 5800 5880</big></a><br />
+<big><br />
+<br />
+<a href="http://etserv.etheli.com/FreqSetGen/run" target="_blank"><b>FreqSetGen</b></a><br />
+<br />
+The <a href="http://etserv.etheli.com/FreqSetGen/run" target="_blank">FreqSetGen tool</a>
+attempts to generate an optimal set of frequencies given a larger set
+of possible frequencies.&nbsp; The tool has the following entry fields:<br />
+<br />
+<i>Number of frequencies:</i>&nbsp; The number of frequencies in each generated set.<br />
+<br />
+<i>Possible frequencies:</i>&nbsp; A list of all the possible
+frequencies to choose from.&nbsp; Note that the larger this list is,
+the more time the generator processor will need to complete.<br />
+<br />
+<i>Mandatory frequencies:</i>&nbsp; An optional list of frequencies that mush appear in each generated set.<br />
+<br />
+<i>Minimum separation:</i>&nbsp; The minimum separation (in MHz)
+between values in the generated frequency sets.&nbsp; Separation less
+than 37 MHz is likely to result in more interference between adjacent
+frequencies.<br />
+<br />
+<i>Maximum run time:</i>&nbsp; The maximum time allowed (in seconds)
+for a run of the generator process.&nbsp; The largest value allowed is
+600 (10 minutes).<br />
+<br />
+<br />
+So far the best 6-frequency set I've found is this one:<br />
+ETBest6:&nbsp; 5645 5685 5760 5805 5905 5945&nbsp;&nbsp;&nbsp; IMD rating: 87&nbsp;&nbsp;&nbsp; <a href="http://etserv.etheli.com/IMDTabler/run?freq_values=+5645+5685+5760+5805+5905+5945" target="_blank">view</a><br />
+<br />
+Removing 5805 yields a very good 5-frequency set:<br />
+ET6minus1:&nbsp; 5645 5685 5760 5905 5945&nbsp;&nbsp;&nbsp; IMD rating: 100&nbsp;&nbsp;&nbsp; <a href="http://etserv.etheli.com/IMDTabler/run?freq_values=+5645+5685+5760+5905+5945" target="_blank">view<br />
+</a><br />
+<br /><b><a href="http://www.etheli.com/IMD/dist" target="_blank">Distribution</a></b><br />
+<br />
+The FreqSetGen tool can be run as a local application for faster processing and unlimited maximum-run-time.&nbsp; (<a href="http://www.java.com" target="_blank">Java</a> version 7 or later is required.)&nbsp; The latest version of ET's IMD Tools may be downloaded from <a href="http://www.etheli.com/IMD/dist" target="_blank">here</a>.&nbsp; FreqSetGen application usage:<br />
+</big>
+<pre><big>FreqSetGen numFreq "possibleFreqs" "mandatoryFreqs" [minFreqSep] [maxRunSecs]</big></pre>
+<big>Example:<br />
+</big>
+<pre><big>FreqSetGen 4 "5740 5760 5780 5800 5820 5840 5860 5880" "5740" 37 300</big></pre>
+<big><br /><b>
+Source Code</b><br />
+<br />
+The Java source is available in the distribution.&nbsp; The web content is via Java <a href="https://www.ntu.edu.sg/home/ehchua/programming/java/JavaServlets.html" target="_blank">servlets</a> running on a <a href="http://tomcat.apache.org" target="_blank">Tomcat</a> server.&nbsp; If reusing the code, please provide attribution:&nbsp; "ET's IMD Tools - http://www.etheli.com"<br />
+<br />
+<br />
+<b>Feedback:</b>&nbsp; If you have comments, questions or suggestions, <a href="http://www.etheli.com/contact" target="_blank">do let me know</a>, or post a comment to the <a href="http://www.rcgroups.com/forums/showthread.php?t=2447038" target="_blank">thread on rcgroups</a>.<br />
+<br />
+<br />
+<b>General Frequency Information</b><br />
+<br />
+Band 1: 5740 5760 5780 5800 5820 5840 5860 5880&nbsp; (IRC NexWave / Fatshark)<br />
+Band 2: 5705 5685 5665 5645 5885 5905 5925 5945&nbsp; (Boscam E / DJI)<br />
+Band 3: 5733 5752 5771 5790 5809 5828 5847 5866&nbsp; (Boscam B)<br />
+Band 4: 5865 5845 5825 5805 5785 5765 5745 5725&nbsp; (Boscam A / TBS / RC305)<br />
+RaceBand:&nbsp; 5658 5695 5732 5769 5806 5843 5880 5917<br />
+<br />
+<a href="http://www.etheli.com/freq/FPV_5.8GHz_Freqs.jpg" target="_blank">5.8GHz FPV "Visual" Frequency Chart<br />
+</a></big><big><br />
+<hr /><br />
+Click <a target="_blank" href="http://www.etheli.com/contact/index.html">here to
+contact me</a><br />
+<br />
+<a target="_blank" href="http://www.etheli.com">etheli.com home page</a></big><br />
+</body></html>

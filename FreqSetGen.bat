@@ -1,0 +1,1 @@
+java -jar FreqSetGen.jar %*
