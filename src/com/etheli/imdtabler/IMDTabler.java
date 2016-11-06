@@ -1,7 +1,7 @@
 //IMDTabler.java:  Utility for generating tables of frequency values for
 //                 intermodulation distortion.
 //
-//   9/4/2016 -- [ET]
+//  11/4/2016 -- [ET]
 //
 
 package com.etheli.imdtabler;
@@ -17,14 +17,15 @@ import java.util.Arrays;
  */
 public class IMDTabler
 {
-  public static final String VERSION_STR = "1.01";
-  public static final int MIN_DISP_FREQ = 5500;
-  public static final int MAX_DISP_FREQ = 5999;
+  public static final String VERSION_STR = "1.1";
+  public static final int MIN_DISP_FREQ = 5100;
+  public static final int MAX_DISP_FREQ = 6099;
   public static final int MIN_FREQ_SEP = 35; //min freq separation for warning
-  public static final int NO_CLR_DIFF = 29;  //min diff for colored cell background
   public static final String OUT_FILE_NAME = "IMDTableFile.html";
-  public static final int RATING_DIFF_LIMIT = 30; //anything higher is "good"
   public static final int RATING_MAX_VALUE = 100; //top value for ratings
+  public static final int RATING_DIFF_LIMIT = 35; //anything higher is "good"
+                        //minimum difference for colored cell background:
+  public static final int NO_CLR_DIFF = RATING_DIFF_LIMIT;
   
   /**
    * Generates an IMDTable for the given set of frequencies.
@@ -451,8 +452,17 @@ public class IMDTabler
     public String getSelFreqSetDispStr()
     {
       final StringBuffer buff = new StringBuffer();
-      for(int i=0; i<selFreqSetArr.length; ++i)
-        buff.append(" " + selFreqSetArr[i]);
+      if(selFreqSetArr.length > 0)
+      {
+        int i = 0;
+        while(true)
+        {
+          buff.append(Integer.toString(selFreqSetArr[i]));
+          if(++i >= selFreqSetArr.length)
+            break;
+          buff.append(' ');
+        }
+      }
       return buff.toString();
     }
     

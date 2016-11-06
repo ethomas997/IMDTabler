@@ -1,7 +1,7 @@
 //FreqSetGen.java:  Utility for generating sets of frequency values
 //                  ranked via intermodulation distortion.
 //
-//   9/4/2016 -- [ET]
+//  11/4/2016 -- [ET]
 //
 
 package com.etheli.imdtabler;
@@ -25,7 +25,7 @@ import java.io.PrintWriter;
  */
 public class FreqSetGen
 {
-  public static final String VERSION_STR = "1.01";
+  public static final String VERSION_STR = "1.1";
   public static final String PROG_SHORT_TITLESTR = "ET's FreqSetGen";
   public static final String PROG_LONG_TITLESTR = "Frequency Set Generator";
   public static final String SITE_HOME_URLSTR = "http://etserv.etheli.com";
@@ -475,7 +475,7 @@ public class FreqSetGen
 
     for(FreqSetResult fsrObj : sortedFreqSetResultList)
     {
-      buff.append("<br>\n &nbsp;" + fsrObj.getTableSelFreqSetDispStr() +
+      buff.append("<br>\n &nbsp; " + fsrObj.getTableSelFreqSetDispStr() +
                     " &nbsp;&nbsp; IMD rating: " + fsrObj.tableRatingValue +
                  " &nbsp;&nbsp; <a href=\"" + fsrObj.getTablerViewUrlStr() +
                                            "\" target=\"_blank\">view</a>");
