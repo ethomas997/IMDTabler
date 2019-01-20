@@ -1,6 +1,7 @@
 //IMDTablerServlet.java:  Servlet interface for IMDTabler.
 //
 //  11/4/2016 -- [ET]
+//  1/19/2019 -- [ET]  Modified header text to include IMD 6C, etc.
 //
 
 package com.etheli.imdtabler;
@@ -41,10 +42,9 @@ public class IMDTablerServlet extends HttpServlet
          out.println("Links:&nbsp; <a href=\"http://www.etheli.com/IMD\" target=\"_blank\">IMDTools</a>, " +
              "<a href=\"http://etserv.etheli.com/FreqSetGen/run\" target=\"_blank\">FreqSetGen</a>.&nbsp;");
          out.println("Sample frequency sets:<br>");
-         out.println("<a href=\"run?freq_values=5685+5760+5800+5860+5905\">IMD 5</a>: 5685 5760 5800 5860 5905, <a href=\"run?freq_values=5645+5685+5760+5800+5860+5905\">IMD 6</a>: 5645 5685 5760 5800 5860 5905<br>");
-         out.println("<a href=\"run?freq_values=5665+5752+5800+5866+5905\">ET5A</a>: 5665 5752 5800 5866 5905, <a href=\"run?freq_values=5665+5752+5800+5865+5905\">ET5B</a>: 5665 5752 5800 5865 5905<br>");
-         out.println("<a href=\"run?freq_values=5665+5760+5800+5865+5905\">ET5C</a>: 5665 5760 5800 5865 5905, <a href=\"run?freq_values=5645+5685+5760+5805+5905+5945\">ETBest6</a>: 5645 5685 5760 5805 5905 5945<br>");
-         out.println("<a href=\"run?freq_values=5645+5685+5760+5905+5945\">ET6minus1</a>: 5645 5685 5760 5905 5945, <a href=\"run?freq_values=5665+5725+5820+5860+5945\">ET 5</a>: 5665 5725 5820 5860 5945<br>");
+         out.println("<a href=\"run?freq_values=5658+5695+5760+5800+5880+5917\">IMD 6C</a>: 5658 5695 5760 5800 5880 5917, <a href=\"run?freq_values=5665+5725+5820+5860+5945\">ET5</a>: 5665 5725 5820 5860 5945<br>");
+         out.println("<a href=\"run?freq_values=5645+5685+5760+5805+5905+5945\">ETBest6</a>: 5645 5685 5760 5805 5905 5945, <a href=\"run?freq_values=5645+5685+5760+5905+5945\">ET6minus1</a>: 5645 5685 5760 5905 5945<br>");
+         out.println("<a href=\"run?freq_values=5665+5752+5800+5866+5905\">ET5A</a>: 5665 5752 5800 5866 5905, <a href=\"run?freq_values=5658+5732+5843+5917\">Racebnd4</a>: 5658 5732 5843 5917<br>");
          out.println("<a href=\"run?freq_values=5645+5740+5820+5860+5945\"></a><a href=\"run?freq_values=5658+5695+5732+5769+5806+5843+5880+5917\">raceband</a>: 5658 5695 5732 5769 5806 5843 5880 5917,");
          out.println("<a href=\"run?freq_values=5780+5860+5945\">Freq in YT video</a>: 5780 5860 5945<br>");
          out.println("<br>");

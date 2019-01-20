@@ -25,7 +25,7 @@ import java.io.PrintWriter;
  */
 public class FreqSetGen
 {
-  public static final String VERSION_STR = "1.1";
+  public static final String VERSION_STR = "1.21";
   public static final String PROG_SHORT_TITLESTR = "ET's FreqSetGen";
   public static final String PROG_LONG_TITLESTR = "Frequency Set Generator";
   public static final String SITE_HOME_URLSTR = "http://etserv.etheli.com";
@@ -37,7 +37,9 @@ public class FreqSetGen
   public static final String ERROR_OUTFILE_STR = "FreqSetGenErrors.txt";
   public static final String CHECK_INSTANCES_STR = "checkInstances";
   public static final String DONE_TASK_CMDSTR = "FreqSetGenDoneTask.bat";
-  public static final boolean DONE_TASK_FLAG = true;
+  public static final String FILE_SEPARATOR_STR = File.separator;
+  public static final char FILE_SEPARATOR_CHAR = File.separatorChar;
+  public static final boolean DONE_TASK_FLAG = false;
   public static final int MAX_INSTANCE_COUNT = 3;
   public static final int NUM_RESULTS_SAVED = 25;
   public static final int DEF_MIN_FREQ_SEP = 37; //default minimum freq separation
@@ -65,6 +67,8 @@ public class FreqSetGen
   private long genStopTimeMs = 0;
   private int progressPercentDone = 0;
   private int estTimeRemainingSecs = 0;
+  private static boolean isOSDeterminedFlag = false;
+  private static boolean isOSWindowsFlag = false;
   private static boolean normalProgramExitFlag = false;
   private boolean programTerminateFlag = false;
   private final DateFormat lastUpdatedDateFormatter =
@@ -489,20 +493,20 @@ public class FreqSetGen
 
     commitOutputFile(buff.toString(),doneFlag);
 
-    if(doneFlag && DONE_TASK_FLAG && !launchFileInBrowserFlag &&
-                                    (new File(DONE_TASK_CMDSTR)).exists() &&
-                                     (new File(outputFileNameStr)).exists())
-    {  //"done" task enabled & not using local browser (running via servlet)
-       // and task-command and results-output files found OK
-              //execute done-task command with output pathname and "subject"
-              // text ("FreqSetGen reqIP outDir/outFile") as arguments:
-      execCmdNoResp(DONE_TASK_CMDSTR + " \"" + outputFileNameStr +
-                       "\" \"FreqSetGen " + ((remoteAddressString != null &&
-                                  remoteAddressString.trim().length() > 0) ?
-                                         (remoteAddressString + ' ') : "") +
-                      getViewDirFromOutDirFileStr(outputFileNameStr) + '/' +
-                    getViewFileFromOutDirFileStr(outputFileNameStr) + '\"');
-    }
+//    if(doneFlag && DONE_TASK_FLAG && !launchFileInBrowserFlag &&
+//                                    (new File(DONE_TASK_CMDSTR)).exists() &&
+//                                     (new File(outputFileNameStr)).exists())
+//    {  //"done" task enabled & not using local browser (running via servlet)
+//       // and task-command and results-output files found OK
+//              //execute done-task command with output pathname and "subject"
+//              // text ("FreqSetGen reqIP outDir/outFile") as arguments:
+//      execCmdNoResp(DONE_TASK_CMDSTR + " \"" + outputFileNameStr +
+//                       "\" \"FreqSetGen " + ((remoteAddressString != null &&
+//                                  remoteAddressString.trim().length() > 0) ?
+//                                         (remoteAddressString + ' ') : "") +
+//                      getViewDirFromOutDirFileStr(outputFileNameStr) + '/' +
+//                    getViewFileFromOutDirFileStr(outputFileNameStr) + '\"');
+//    }
   }
 
   /**
@@ -705,7 +709,7 @@ public class FreqSetGen
                               (p=outFileArgStr.indexOf(OUT_SUBDIR_STR)) > 0)
       {  //path to output files located OK; use top of path for error file
         outFStr = outFileArgStr.substring(0,p) + OUT_SUBDIR_STR +
-                                                   File.separator + outFStr;
+                                               FILE_SEPARATOR_STR + outFStr;
       }
       final PrintWriter wtrObj = new PrintWriter(
                                               new FileWriter(outFStr,true));
@@ -749,8 +753,8 @@ public class FreqSetGen
    */
   public static String generateOutDirFileNameStr(String dirStr, String fileStr)
   {
-    final char SEPCH = File.separatorChar;
-    return OUT_SUBDIR_STR + SEPCH + dirStr + SEPCH + fileStr + ".html";
+    return OUT_SUBDIR_STR + FILE_SEPARATOR_CHAR + dirStr +
+                                    FILE_SEPARATOR_CHAR + fileStr + ".html";
   }
 
   /**
@@ -761,7 +765,7 @@ public class FreqSetGen
   public static String getViewFileFromOutDirFileStr(String outDirFileStr)
   {
     int p,q;
-    if((p=outDirFileStr.lastIndexOf(File.separatorChar)) > 0)
+    if((p=outDirFileStr.lastIndexOf(FILE_SEPARATOR_CHAR)) > 0)
     {  //found last '/' separator; remove trailing ".html" (if any)
       if((q=outDirFileStr.lastIndexOf('.')) <= p)
         q = outDirFileStr.length();
@@ -778,9 +782,9 @@ public class FreqSetGen
   public static String getViewDirFromOutDirFileStr(String outDirFileStr)
   {
     int p,q;
-    if((q=outDirFileStr.lastIndexOf(File.separatorChar)) > 0)
+    if((q=outDirFileStr.lastIndexOf(FILE_SEPARATOR_CHAR)) > 0)
     {  //found last '/' separator; find next-to-last separator
-      if((p=outDirFileStr.lastIndexOf(File.separatorChar,q-1)) < 0)
+      if((p=outDirFileStr.lastIndexOf(FILE_SEPARATOR_CHAR,q-1)) < 0)
         p = 0;
       return outDirFileStr.substring(p+1,q);
     }
@@ -983,14 +987,29 @@ public class FreqSetGen
    */
   public static int getProgInstanceCount()
   {
-    final String respStr;         //get list of running processes:
-//    if((respStr=execCmdGetResp("wmic process list")) != null)
-    if((respStr=execCmdGetResp("tasklist /V")) != null)
+    try
     {
-      int p = 0, count = 0;
-      while((p=respStr.indexOf(FreqSetGen.class.getName(),p+1)) > 0)
-        ++count;
-      return count;
+      String respStr;
+        //get list of running processes:
+      if(isWindowsOS())
+      {
+  //      respStr = execCmdGetResp("wmic process list");
+        respStr = execCmdGetResp("tasklist /V");
+      }
+      else
+        respStr = execCmdGetResp("ps -Af");
+      
+      if(respStr != null)
+      {
+        int p = 0, count = 0;
+        while((p=respStr.indexOf(FreqSetGen.class.getName(),p+1)) > 0)
+          ++count;
+        return count;
+      }
+
+    }
+    catch(Exception ex)
+    {
     }
     return 0;
   }
@@ -1018,6 +1037,50 @@ public class FreqSetGen
   }
 
   /**
+   * Executes the given command and returns the response.
+   * @param cmdStr system command to be executed.
+   * @return A string containing the generated response, or an
+   * error message if an error occurred.
+   */
+  public static String execCmdGetRespMsg(String cmdStr)
+  {
+    try
+    {
+      final Process procObj = Runtime.getRuntime().exec(cmdStr);
+      final InputStream inStm = procObj.getInputStream();
+      @SuppressWarnings("resource")
+      final Scanner scannerObj = new Scanner(inStm).useDelimiter("\\A");
+      return scannerObj.hasNext() ? scannerObj.next() : "";
+    }
+    catch(IOException e)
+    {
+      return e.toString();
+    }
+  }
+
+  /**
+   * Executes the given command and returns the response.
+   * @param cmdStrArr system command and arguments to be executed.
+   * @return A string containing the generated response, or an
+   * error message if an error occurred.
+   */
+  public static String execCmdGetRespMsg(String [] cmdStrArr)
+  {
+    try
+    {
+      final Process procObj = Runtime.getRuntime().exec(cmdStrArr);
+      final InputStream inStm = procObj.getInputStream();
+      @SuppressWarnings("resource")
+      final Scanner scannerObj = new Scanner(inStm).useDelimiter("\\A");
+      return scannerObj.hasNext() ? scannerObj.next() : "";
+    }
+    catch(IOException e)
+    {
+      return e.toString();
+    }
+  }
+
+  /**
    * Executes the given command and ignores any response.
    * @param cmdStr system command to be executed.
    * @return true if successful; false if an error occurred.
@@ -1033,6 +1096,44 @@ public class FreqSetGen
     {
       return false;
     }
+  }
+
+  /**
+   * Executes the given command and ignores any response.
+   * @param cmdStrArr system command and arguments to be executed.
+   * @return true if successful; false if an error occurred.
+   */
+  public static boolean execCmdNoResp(String [] cmdStrArr)
+  {
+    try
+    {
+      Runtime.getRuntime().exec(cmdStrArr);
+      return true;
+    }
+    catch(Exception e)
+    {
+      return false;
+    }
+  }
+  
+
+  /**
+   * Determines if the operating system is Windows.
+   * @return true if the operating system is Windows.
+   */
+  public static boolean isWindowsOS()
+  {
+    if (!isOSDeterminedFlag)
+    {
+      isOSDeterminedFlag = true;
+      try
+      {
+        isOSWindowsFlag = (System.getProperty("os.name","").toLowerCase().indexOf(
+                                                                 "windows") >= 0);
+      }
+      catch(Exception ex) {}
+    }
+    return isOSWindowsFlag;
   }
 
 

@@ -117,7 +117,11 @@ public class FreqSetGenServlet extends HttpServlet
             final char SEPCH = File.separatorChar;
             String tomcatBaseDir = System.getProperty(CATALINA_PROP_STR);
             if(tomcatBaseDir == null || tomcatBaseDir.trim().length() <= 0)
-              tomcatBaseDir = "C:" + SEPCH + "JavaApps" + SEPCH + "Tomcat";
+            {  //no "catalina.base" property, no put in local default value
+              tomcatBaseDir = (FreqSetGen.isWindowsOS()) ?
+                            ("C:" + SEPCH + "JavaApps" + SEPCH + "Tomcat") :
+                                                            ("/opt/tomcat");
+            }
             final String outDirFileNameStr =
                                      FreqSetGen.generateOutDirFileNameStr();
             outputPathameStr = tomcatBaseDir + SEPCH + WEBAPPS_DIR_STR +
@@ -137,11 +141,16 @@ public class FreqSetGenServlet extends HttpServlet
               final String classesDirStr = tomcatBaseDir + SEPCH +
                                 WEBAPPS_DIR_STR + SEPCH + SERVLET_NAME_STR +
                                  SEPCH + WEBINF_DIR_STR + SEPCH + "classes";
-                   //build command string to launch FreqSetGen process
+
+                   // if Windows OS then prepend with 'cmd.exe' launch command
                    // (set class name as window title so it will show when
                    //  "tasklist /V" command used to check # of instances):
-              final String cmdStr = "cmd.exe /C start \"" +
-                          FreqSetGen.class.getName() + "\" /MIN java -cp " +
+              if(FreqSetGen.isWindowsOS())
+              {
+                   //build command string to launch FreqSetGen process
+                final String cmdStr = "cmd.exe /C start \"" +
+                                   FreqSetGen.class.getName() + "\" /MIN " +  
+                                      "java -Djava.awt.headless=true -cp " +
                   classesDirStr + ' ' + FreqSetGen.class.getName() + " \"" +
                         outputPathameStr + "\" " + numberFreqInSet + " \"" +
                    FreqSetGen.intArrToString(possibleFreqSetArr) + "\" \"" +
@@ -150,7 +159,28 @@ public class FreqSetGenServlet extends HttpServlet
                                       ' ' + FreqSetGen.CHECK_INSTANCES_STR +
                                               ' ' + request.getRemoteAddr();
                    //launch FreqSetGen process:
-              FreqSetGen.execCmdNoResp(cmdStr);
+                FreqSetGen.execCmdNoResp(cmdStr);
+              }
+              else
+              {    // if Linux OS then build command string array for FreqSetGen process
+                String [] cmdStrArr =
+                        { "java",
+                           "-Djava.awt.headless=true",
+                           "-cp",
+                           classesDirStr,
+                           FreqSetGen.class.getName(),
+                           outputPathameStr,
+                           Integer.toString(numberFreqInSet),
+                           FreqSetGen.intArrToString(possibleFreqSetArr),
+                           FreqSetGen.intArrToString(mandatoryFreqSetArr),
+                           Integer.toString(minFreqSeparation),
+                           Integer.toString(maxRunTimeSecs),
+                           FreqSetGen.CHECK_INSTANCES_STR,
+                           request.getRemoteAddr() };
+                   //launch FreqSetGen process:
+                FreqSetGen.execCmdNoResp(cmdStrArr);
+              }
+
                    //wait for results file to be available:
               final File outFileObj = new File(outputPathameStr);
               int cnt = 0;
